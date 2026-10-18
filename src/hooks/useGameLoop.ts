@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef } from 'react';
+import { AppState } from 'react-native';
 
-import { createInitialState, step } from '../game/engine';
+import { createInitialState, pause, step } from '../game/engine';
 import type { GameState, Input } from '../game/types';
 
 // Avanza el juego en cada frame con requestAnimationFrame. El estado vive en un ref
@@ -27,6 +28,16 @@ export function useGameLoop(readInput: () => Input): GameState {
 
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
+  }, []);
+
+  // Auto-pausa al salir de la app (en web, al ocultarse la pestaña).
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (status) => {
+      if (status === 'active') return;
+      stateRef.current = pause(stateRef.current);
+      forceRender();
+    });
+    return () => sub.remove();
   }, []);
 
   return stateRef.current;

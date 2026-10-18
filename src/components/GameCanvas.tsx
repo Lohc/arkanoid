@@ -16,6 +16,8 @@ import { WORLD_H, WORLD_W } from '../game/constants';
 import { SPRITES, type SpriteFrame } from '../game/sprites';
 import type { GameState } from '../game/types';
 import { fitWorld } from '../game/viewport';
+import { Hud } from './Hud';
+import { Overlay } from './Overlay';
 
 const BACKGROUND = '#10101c';
 const LETTERBOX = '#000';
@@ -82,9 +84,13 @@ export function GameCanvas({ state }: Props) {
   return (
     <View style={styles.container} onLayout={onLayout} pointerEvents="none">
       {picture && (
-        <Canvas style={{ width, height }}>
-          <Picture picture={picture} />
-        </Canvas>
+        <View style={{ width, height }}>
+          <Canvas style={StyleSheet.absoluteFill}>
+            <Picture picture={picture} />
+          </Canvas>
+          <Hud state={state} scale={scale} />
+          <Overlay phase={state.phase} scale={scale} />
+        </View>
       )}
     </View>
   );

@@ -15,6 +15,7 @@ import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { WORLD_H, WORLD_W } from '../game/constants';
 import { SPRITES, type SpriteFrame } from '../game/sprites';
 import type { GameState } from '../game/types';
+import { fitWorld } from '../game/viewport';
 
 const BACKGROUND = '#10101c';
 const LETTERBOX = '#000';
@@ -56,11 +57,12 @@ interface Props {
 }
 
 // Dibuja el mundo 448×640 escalado uniformemente y centrado (letterbox).
+// No recibe eventos: el input lo captura la View padre (useGameInput).
 export function GameCanvas({ state }: Props) {
   const image = useImage(require('../../assets/spritesheet-breakout.png'));
   const [size, setSize] = useState({ w: 0, h: 0 });
 
-  const scale = Math.min(size.w / WORLD_W, size.h / WORLD_H);
+  const { scale } = fitWorld(size.w, size.h);
   const width = WORLD_W * scale;
   const height = WORLD_H * scale;
 
@@ -78,7 +80,7 @@ export function GameCanvas({ state }: Props) {
   };
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
+    <View style={styles.container} onLayout={onLayout} pointerEvents="none">
       {picture && (
         <Canvas style={{ width, height }}>
           <Picture picture={picture} />

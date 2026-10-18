@@ -2,20 +2,17 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 
 import { GameCanvas } from './src/components/GameCanvas';
-import type { Input } from './src/game/types';
 import { useGameLoop } from './src/hooks/useGameLoop';
-
-// Sin controles todavía (paso 8).
-const idleInput: Input = { paddleTargetX: null, keyDir: 0, tap: false };
-const readIdleInput = () => idleInput;
+import { useGameInput } from './src/input/useGameInput';
 
 export default function App() {
-  const state = useGameLoop(readIdleInput);
+  const { viewProps, readInput } = useGameInput();
+  const state = useGameLoop(readInput);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} {...viewProps}>
       <GameCanvas state={state} />
-      <StatusBar style='light' hidden />
+      <StatusBar style="light" hidden />
     </View>
   );
 }

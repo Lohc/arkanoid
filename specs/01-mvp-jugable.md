@@ -1,6 +1,6 @@
 # SPEC 01 — MVP jugable de Arkanoid
 
-> **Estado:** Borrador
+> **Estado:** aprobado
 > **Depende de:** —
 > **Fecha:** 2026-10-18
 > **Objetivo:** Crear el proyecto Expo y un nivel único de Arkanoid jugable en iOS, Android y web, con vidas, puntuación y pantallas de inicio y fin.
@@ -43,13 +43,43 @@ Es la primera spec: no hay proyecto todavía. Fija las bases técnicas (Expo + T
 
 ```ts
 // src/game/types.ts
-export type BrickColor = 'red' | 'yellow' | 'cyan' | 'magenta' | 'hotpink' | 'green';
+export type BrickColor =
+  | 'red'
+  | 'yellow'
+  | 'cyan'
+  | 'magenta'
+  | 'hotpink'
+  | 'green';
 
-export type Phase = 'start' | 'serve' | 'playing' | 'paused' | 'gameover' | 'won';
+export type Phase =
+  | 'start'
+  | 'serve'
+  | 'playing'
+  | 'paused'
+  | 'gameover'
+  | 'won';
 
-export interface Brick { x: number; y: number; w: number; h: number; color: BrickColor; alive: boolean; }
-export interface Paddle { x: number; y: number; w: number; h: number; }          // x = borde izquierdo
-export interface Ball { x: number; y: number; r: number; vx: number; vy: number; } // x,y = centro
+export interface Brick {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  color: BrickColor;
+  alive: boolean;
+}
+export interface Paddle {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+} // x = borde izquierdo
+export interface Ball {
+  x: number;
+  y: number;
+  r: number;
+  vx: number;
+  vy: number;
+} // x,y = centro
 
 export interface GameState {
   phase: Phase;
@@ -63,22 +93,31 @@ export interface GameState {
 
 export interface Input {
   paddleTargetX: number | null; // centro deseado del paddle (dedo/ratón), coords de mundo
-  keyDir: -1 | 0 | 1;           // flechas en web
-  tap: boolean;                 // tap/clic/Espacio en este frame
+  keyDir: -1 | 0 | 1; // flechas en web
+  tap: boolean; // tap/clic/Espacio en este frame
 }
 ```
 
 ```ts
 // src/game/constants.ts
-WORLD_W = 448; WORLD_H = 640;
-BRICK_W = 32; BRICK_H = 16; BRICK_COLS = 13; BRICK_ROWS = 6;
-BRICKS_OFFSET_X = 16; BRICKS_OFFSET_Y = 64;
-PADDLE_W = 96; PADDLE_H = 14; PADDLE_Y = 600;
-PADDLE_KEY_SPEED = 480;       // px/s
-BALL_R = 8; BALL_SPEED = 360; // px/s
-MAX_BOUNCE_ANGLE = 60;        // grados
-INITIAL_LIVES = 3; BRICK_POINTS = 10;
-MAX_DT = 1 / 30;              // s, tope por frame
+WORLD_W = 448;
+WORLD_H = 640;
+BRICK_W = 32;
+BRICK_H = 16;
+BRICK_COLS = 13;
+BRICK_ROWS = 6;
+BRICKS_OFFSET_X = 16;
+BRICKS_OFFSET_Y = 64;
+PADDLE_W = 96;
+PADDLE_H = 14;
+PADDLE_Y = 600;
+PADDLE_KEY_SPEED = 480; // px/s
+BALL_R = 8;
+BALL_SPEED = 360; // px/s
+MAX_BOUNCE_ANGLE = 60; // grados
+INITIAL_LIVES = 3;
+BRICK_POINTS = 10;
+MAX_DT = 1 / 30; // s, tope por frame
 ```
 
 Convenciones:
@@ -154,13 +193,13 @@ Transiciones de `phase`:
 
 ## Riesgos
 
-| Riesgo | Mitigación |
-| --- | --- |
-| Skia en web requiere cargar `canvaskit.wasm` | Paso 6 incluye `setup-skia-web` y carga explícita antes de montar; verificar con `npm run web`. |
+| Riesgo                                                | Mitigación                                                                                              |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Skia en web requiere cargar `canvaskit.wasm`          | Paso 6 incluye `setup-skia-web` y carga explícita antes de montar; verificar con `npm run web`.         |
 | Re-render de React a 60 fps degrada en móviles lentos | Árbol pequeño (canvas + HUD). Si se nota, migrar a valores compartidos de Skia/Reanimated en otra spec. |
-| Túnel de la bola a través de bloques con `dt` grande | `MAX_DT` limita el avance a 12 px por paso, menos que el alto de un bloque (16 px). |
-| `create-expo-app` rechaza el directorio no vacío | Generar en carpeta temporal y mover archivos (paso 1). |
-| Eventos de puntero distintos entre web y nativo | Capa única `useGameInput` que normaliza a `Input` en coords de mundo. |
+| Túnel de la bola a través de bloques con `dt` grande  | `MAX_DT` limita el avance a 12 px por paso, menos que el alto de un bloque (16 px).                     |
+| `create-expo-app` rechaza el directorio no vacío      | Generar en carpeta temporal y mover archivos (paso 1).                                                  |
+| Eventos de puntero distintos entre web y nativo       | Capa única `useGameInput` que normaliza a `Input` en coords de mundo.                                   |
 
 ## Lo que **no** entra en esta spec
 

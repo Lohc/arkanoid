@@ -1,6 +1,6 @@
 # SPEC 01 — MVP jugable de Arkanoid
 
-> **Estado:** aprobado
+> **Estado:** Implementado
 > **Depende de:** —
 > **Fecha:** 2026-10-18
 > **Objetivo:** Crear el proyecto Expo y un nivel único de Arkanoid jugable en iOS, Android y web, con vidas, puntuación y pantallas de inicio y fin.
@@ -151,26 +151,26 @@ Transiciones de `phase`:
 
 ## Criterios de aceptación
 
-- [ ] El repo es un repositorio git y `npm install` termina sin errores.
-- [ ] `npm test` pasa todos los tests de `src/game/`.
-- [ ] `npm run web` abre el juego sin errores en consola.
-- [ ] El juego arranca en Android (Expo Go o emulador) sin errores.
-- [ ] El juego arranca en iOS (Expo Go o simulador) sin errores; si no hay entorno iOS disponible, se indica en la entrega.
-- [ ] La pantalla inicial muestra 78 bloques en 6 filas: red, yellow, cyan, magenta, hotpink, green de arriba a abajo.
-- [ ] La pantalla inicial muestra "Toca para empezar" y la bola sobre el paddle.
-- [ ] El área de juego mantiene proporción 448:640 con letterbox en cualquier tamaño de ventana.
-- [ ] En móvil la app no rota a horizontal.
-- [ ] Arrastrar el dedo mueve el paddle; en web el ratón y las flechas lo mueven.
-- [ ] El paddle nunca sale de los límites del mundo.
-- [ ] Tap, clic o `Espacio` saca la bola.
-- [ ] La bola rebota en paredes laterales y techo.
-- [ ] Golpear el centro del paddle hace salir la bola vertical; golpear un borde la hace salir a ~60°.
-- [ ] Romper un bloque lo elimina y suma exactamente 10 puntos al HUD.
-- [ ] Perder la bola resta una vida y la deja pegada al paddle esperando saque.
-- [ ] Perder la tercera vida muestra Game Over; tocar reinicia con 3 vidas, 0 puntos y 78 bloques.
-- [ ] Romper los 78 bloques muestra Victoria; tocar reinicia.
-- [ ] Enviar la app a background (o cambiar de pestaña) y volver la muestra en pausa con la bola en la misma posición; tocar reanuda.
-- [ ] `CLAUDE.md` lista los comandos reales de build y test.
+- [x] El repo es un repositorio git y `npm install` termina sin errores.
+- [x] `npm test` pasa todos los tests de `src/game/`.
+- [x] `npm run web` abre el juego sin errores en consola.
+- [x] El juego arranca en Android (Expo Go o emulador) sin errores.
+- [x] El juego arranca en iOS (Expo Go o simulador) sin errores; si no hay entorno iOS disponible, se indica en la entrega.
+- [x] La pantalla inicial muestra 78 bloques en 6 filas: red, yellow, cyan, magenta, hotpink, green de arriba a abajo.
+- [x] La pantalla inicial muestra "Toca para empezar" y la bola sobre el paddle.
+- [x] El área de juego mantiene proporción 448:640 con letterbox en cualquier tamaño de ventana.
+- [x] En móvil la app no rota a horizontal.
+- [x] Arrastrar el dedo mueve el paddle; en web el ratón y las flechas lo mueven.
+- [x] El paddle nunca sale de los límites del mundo.
+- [x] Tap, clic o `Espacio` saca la bola.
+- [x] La bola rebota en paredes laterales y techo.
+- [x] Golpear el centro del paddle hace salir la bola vertical; golpear un borde la hace salir a ~60°.
+- [x] Romper un bloque lo elimina y suma exactamente 10 puntos al HUD.
+- [x] Perder la bola resta una vida y la deja pegada al paddle esperando saque.
+- [x] Perder la tercera vida muestra Game Over; tocar reinicia con 3 vidas, 0 puntos y 78 bloques.
+- [x] Romper los 78 bloques muestra Victoria; tocar reinicia.
+- [x] Enviar la app a background (o cambiar de pestaña) y volver la muestra en pausa con la bola en la misma posición; tocar reanuda.
+- [x] `CLAUDE.md` lista los comandos reales de build y test.
 
 ## Decisiones
 

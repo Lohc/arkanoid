@@ -42,3 +42,6 @@ yarn-error.*
 
 # Skia web (copiado por postinstall)
 public/canvaskit.wasm
+
+# IDE
+.idea/

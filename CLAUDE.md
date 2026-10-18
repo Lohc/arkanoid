@@ -4,9 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado del proyecto
 
-Juego Arkanoid con **React Native + Expo**, objetivo: iOS, Android y web. **Aún no hay código de app** (sin `package.json`, sin comandos de build/test). Al crear el proyecto Expo, actualizar este archivo con los comandos reales.
+Juego Arkanoid con **React Native + Expo** (TypeScript), objetivo: iOS, Android y web. Render con `@shopify/react-native-skia`.
 
-El repo tampoco es todavía un repositorio git; `/spec-impl` necesita git para crear ramas.
+## Comandos
+
+- `npm install` — dependencias; `postinstall` copia `canvaskit.wasm` a `public/` (Skia web, ignorado en git).
+- `npm start` — servidor Metro.
+- `npm run web` — juego en el navegador.
+- `npm run android` / `npm run ios` — abre en dispositivo/emulador. Usa `expo-dev-client`, **no Expo Go**: la primera vez (o tras cambiar dependencias nativas) compilar con `npx expo run:android` / `npx expo run:ios` (genera `/android`, `/ios`, ignorados en git).
+- `npm test` — Jest (`jest-expo`); tests en `src/game/__tests__/`. Un archivo: `npx jest src/game/__tests__/engine.test.ts`.
+- `npx tsc --noEmit` — typecheck.
+
+## Estructura
+
+- `src/game/` — lógica pura TS, sin React: `constants`, `types`, `sprites` (coordenadas copiadas de `assets/spritesheet.js`), `level` (bloques), `physics` (colisiones), `engine` (`createInitialState`, `step(state, input, dt)`, `pause`), `viewport` (letterbox 448×640 y pantalla→mundo). Mundo lógico fijo 448×640; velocidades en px/s.
+- `src/hooks/useGameLoop.ts` — bucle `requestAnimationFrame`, estado en ref, auto-pausa con `AppState`.
+- `src/input/useGameInput.ts` — dedo (nativo), puntero y teclado (web) → `Input` en coords de mundo. Sus `viewProps` van en la View contenedora; los hijos usan `pointerEvents="none"`.
+- `src/components/` — `GameCanvas` (Skia, letterbox), `Hud` y `Overlay` (`Text` de RN sobre el canvas, escalados).
+- `index.ts` (nativo) / `index.web.ts` (web: carga CanvasKit con `LoadSkiaWeb` antes de importar `App`).
 
 ## Flujo de trabajo: spec-driven
 

@@ -10,6 +10,7 @@ export type Phase =
   | 'start'
   | 'serve'
   | 'playing'
+  | 'clearing' // último bloque roto, esperando a que terminen las explosiones
   | 'paused'
   | 'gameover'
   | 'won';
@@ -36,12 +37,23 @@ export interface Ball {
   vy: number;
 } // x,y = centro
 
+// Animación en el lugar de un bloque roto. x,y = esquina superior izquierda.
+export interface Explosion {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  color: BrickColor;
+  elapsed: number; // s desde que se rompió
+}
+
 export interface GameState {
   phase: Phase;
   pausedFrom: Phase | null; // fase a la que vuelve al reanudar
   paddle: Paddle;
   ball: Ball;
   bricks: Brick[];
+  explosions: Explosion[];
   lives: number;
   score: number;
 }

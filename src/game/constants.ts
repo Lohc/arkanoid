@@ -21,3 +21,5 @@ export const MAX_BOUNCE_ANGLE = 60; // grados
 export const INITIAL_LIVES = 3;
 export const BRICK_POINTS = 10;
 export const MAX_DT = 1 / 30; // s, tope por frame
+
+export const EXPLOSION_FRAME_TIME = 0.15; // s por frame (EXPLOSION_DURATION = 150 ms)

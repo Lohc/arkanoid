@@ -39,6 +39,7 @@ export function createInitialState(): GameState {
     paddle,
     ball: ballOnPaddle(paddle),
     bricks: createBricks(),
+    explosions: [],
     lives: INITIAL_LIVES,
     score: 0,
   };
@@ -69,6 +70,9 @@ export function step(state: GameState, input: Input, rawDt: number): GameState {
   const dt = Math.min(Math.max(rawDt, 0), MAX_DT);
 
   switch (state.phase) {
+    case 'clearing':
+      return state;
+
     case 'gameover':
     case 'won':
       return input.tap ? createInitialState() : state;

@@ -52,7 +52,8 @@ export function pause(state: GameState): GameState {
   if (
     state.phase !== 'start' &&
     state.phase !== 'serve' &&
-    state.phase !== 'playing'
+    state.phase !== 'playing' &&
+    state.phase !== 'clearing'
   ) {
     return state;
   }
@@ -96,8 +97,9 @@ export function step(state: GameState, input: Input, rawDt: number): GameState {
 
 function stepPhase(state: GameState, input: Input, dt: number): GameState {
   switch (state.phase) {
+    // Bola y paddle quietos hasta que acaba la explosión del último bloque.
     case 'clearing':
-      return state;
+      return state.explosions.length === 0 ? { ...state, phase: 'won' } : state;
 
     case 'gameover':
     case 'won':
@@ -141,7 +143,7 @@ function stepPhase(state: GameState, input: Input, dt: number): GameState {
         explosions = [...explosions, { x, y, w, h, color, elapsed: 0 }];
         score += BRICK_POINTS;
         if (bricks.every((b) => !b.alive)) {
-          return { ...state, phase: 'won', paddle, ball, bricks, explosions, score };
+          return { ...state, phase: 'clearing', paddle, ball, bricks, explosions, score };
         }
       }
 

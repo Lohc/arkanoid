@@ -124,10 +124,12 @@ describe('bloques', () => {
     expect(s.ball.vy).toBeGreaterThan(0);
   });
 
-  it('romper el último bloque da won, y tap reinicia', () => {
+  it('romper el último bloque da won tras la explosión, y tap reinicia', () => {
     const s0 = createInitialState();
     const bricks = s0.bricks.map((b, i) => ({ ...b, alive: i === 0 }));
-    const s = step(playing(underFirst, { bricks }), idle, DT);
+    let s = step(playing(underFirst, { bricks }), idle, DT);
+    expect(s.phase).toBe('clearing');
+    while (s.phase === 'clearing') s = step(s, idle, DT);
     expect(s.phase).toBe('won');
     expect(step(s, tap, DT)).toEqual(createInitialState());
   });
@@ -199,6 +201,38 @@ describe('explosiones', () => {
     expect(lost.phase).toBe('serve');
     expect(lost.explosions[0].elapsed).toBeCloseTo(DT);
     expect(run(lost, DURATION + DT).explosions).toHaveLength(0);
+  });
+
+  describe('último bloque', () => {
+    function cleared(): GameState {
+      const s0 = createInitialState();
+      const bricks = s0.bricks.map((b, i) => ({ ...b, alive: i === 0 }));
+      return step(playing(underFirst, { bricks }), idle, DT);
+    }
+
+    it('pasa a clearing con bola y paddle quietos aunque haya input', () => {
+      const s = cleared();
+      expect(s.phase).toBe('clearing');
+      const moved = step(s, { paddleTargetX: 50, keyDir: 1, tap: true }, DT);
+      expect(moved.phase).toBe('clearing');
+      expect(moved.ball).toEqual(s.ball);
+      expect(moved.paddle).toEqual(s.paddle);
+      expect(moved.lives).toBe(s.lives);
+    });
+
+    it('pasa a won cuando termina la explosión', () => {
+      const s = cleared();
+      expect(run(s, DURATION - 2 * DT).phase).toBe('clearing');
+      expect(run(s, DURATION + DT).phase).toBe('won');
+    });
+
+    it('se pausa desde clearing y al reanudar vuelve a clearing', () => {
+      const p = pause(cleared());
+      expect(p.phase).toBe('paused');
+      expect(p.pausedFrom).toBe('clearing');
+      expect(run(p, DURATION + DT)).toBe(p);
+      expect(step(p, tap, DT).phase).toBe('clearing');
+    });
   });
 
   it('tap en gameover deja las explosiones vacías', () => {

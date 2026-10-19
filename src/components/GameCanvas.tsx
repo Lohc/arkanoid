@@ -94,7 +94,7 @@ export function GameCanvas({ state }: Props) {
             <Picture picture={picture} />
           </Canvas>
           <Hud state={state} scale={scale} />
-          <Overlay phase={state.phase} scale={scale} />
+          <Overlay phase={state.phase} level={state.level} scale={scale} />
         </View>
       )}
     </View>

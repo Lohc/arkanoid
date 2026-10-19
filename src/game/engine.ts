@@ -12,10 +12,17 @@ import {
   WORLD_H,
   WORLD_W,
 } from './constants';
-import { createBricks } from './level';
+import { createBricks, LEVELS } from './level';
 import { bounceWalls, bouncePaddle, collideBricks } from './physics';
 import { EXPLOSION_FRAMES } from './sprites';
-import type { Ball, Explosion, GameState, Input, Paddle, SoundEvent } from './types';
+import type {
+  Ball,
+  Explosion,
+  GameState,
+  Input,
+  Paddle,
+  SoundEvent,
+} from './types';
 
 // Bola parada encima del centro del paddle, esperando saque.
 function ballOnPaddle(paddle: Paddle): Ball {
@@ -40,11 +47,12 @@ export function createInitialState(): GameState {
     pausedFrom: null,
     paddle,
     ball: ballOnPaddle(paddle),
-    bricks: createBricks(),
+    bricks: createBricks(1),
     explosions: [],
     sounds: [],
     lives: INITIAL_LIVES,
     score: 0,
+    level: 1,
   };
 }
 
@@ -102,7 +110,24 @@ function stepPhase(state: GameState, input: Input, dt: number): GameState {
   switch (state.phase) {
     // Bola y paddle quietos hasta que acaba la explosión del último bloque.
     case 'clearing':
-      return state.explosions.length === 0 ? { ...state, phase: 'won' } : state;
+      if (state.explosions.length > 0) return state;
+      return {
+        ...state,
+        phase: state.level < LEVELS.length ? 'levelClear' : 'won',
+      };
+
+    // Siguiente nivel con la bola sobre el paddle; vidas y puntos se mantienen.
+    case 'levelClear': {
+      if (!input.tap) return state;
+      const level = state.level + 1;
+      return {
+        ...state,
+        phase: 'serve',
+        level,
+        bricks: createBricks(level),
+        ball: ballOnPaddle(state.paddle),
+      };
+    }
 
     case 'gameover':
     case 'won':
@@ -145,11 +170,22 @@ function stepPhase(state: GameState, input: Input, dt: number): GameState {
         sounds.push('break');
         const index = hit.hitIndex;
         const { x, y, w, h, color } = bricks[index];
-        bricks = bricks.map((b, i) => (i === index ? { ...b, alive: false } : b));
+        bricks = bricks.map((b, i) =>
+          i === index ? { ...b, alive: false } : b,
+        );
         explosions = [...explosions, { x, y, w, h, color, elapsed: 0 }];
         score += BRICK_POINTS;
         if (bricks.every((b) => !b.alive)) {
-          return { ...state, phase: 'clearing', paddle, ball, bricks, explosions, score, sounds };
+          return {
+            ...state,
+            phase: 'clearing',
+            paddle,
+            ball,
+            bricks,
+            explosions,
+            score,
+            sounds,
+          };
         }
       }
 

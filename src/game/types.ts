@@ -11,6 +11,7 @@ export type Phase =
   | 'serve'
   | 'playing'
   | 'clearing' // último bloque roto, esperando a que terminen las explosiones
+  | 'levelClear' // nivel limpiado (no el último), esperando tap
   | 'paused'
   | 'gameover'
   | 'won';
@@ -59,6 +60,7 @@ export interface GameState {
   sounds: SoundEvent[]; // sonidos a reproducir producidos en este paso
   lives: number;
   score: number;
+  level: number; // 1-based, índice en LEVELS + 1
 }
 
 export interface Input {

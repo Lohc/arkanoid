@@ -12,6 +12,7 @@ import {
   WORLD_W,
 } from '../constants';
 import { createInitialState, explosionFrame, pause, step } from '../engine';
+import { LEVELS } from '../level';
 import type { GameState, Input } from '../types';
 
 const idle: Input = { paddleTargetX: null, keyDir: 0, tap: false };
@@ -124,14 +125,72 @@ describe('bloques', () => {
     expect(s.ball.vy).toBeGreaterThan(0);
   });
 
-  it('romper el último bloque da won tras la explosión, y tap reinicia', () => {
+  it('romper el último bloque del último nivel da won tras la explosión, y tap reinicia', () => {
     const s0 = createInitialState();
     const bricks = s0.bricks.map((b, i) => ({ ...b, alive: i === 0 }));
-    let s = step(playing(underFirst, { bricks }), idle, DT);
+    let s = step(playing(underFirst, { bricks, level: LEVELS.length }), idle, DT);
     expect(s.phase).toBe('clearing');
     while (s.phase === 'clearing') s = step(s, idle, DT);
     expect(s.phase).toBe('won');
     expect(step(s, tap, DT)).toEqual(createInitialState());
+  });
+});
+
+describe('niveles', () => {
+  const underFirst = { x: 32, y: 80 + BALL_R + 1, vx: 0, vy: -BALL_SPEED };
+
+  // Rompe el único bloque vivo del nivel y deja terminar la explosión.
+  function clearLevel(level: number, over: Partial<GameState> = {}): GameState {
+    const s0 = createInitialState();
+    const bricks = s0.bricks.map((b, i) => ({ ...b, alive: i === 0 }));
+    let s = step(playing(underFirst, { bricks, level, ...over }), idle, DT);
+    while (s.phase === 'clearing') s = step(s, idle, DT);
+    return s;
+  }
+
+  it('empieza en el nivel 1', () => {
+    expect(createInitialState().level).toBe(1);
+  });
+
+  it('limpiar el nivel 1 lleva a levelClear y sin tap se queda ahí', () => {
+    const s = clearLevel(1);
+    expect(s.phase).toBe('levelClear');
+    expect(step(s, { ...idle, keyDir: 1, paddleTargetX: 50 }, DT)).toBe(s);
+  });
+
+  it('tap en levelClear carga el nivel 2 en serve con mismas vidas y puntos', () => {
+    const s = clearLevel(1, { lives: 2, score: 500 });
+    const next = step(s, tap, DT);
+    expect(next.phase).toBe('serve');
+    expect(next.level).toBe(2);
+    expect(next.bricks).toHaveLength(48);
+    expect(next.bricks.every((b) => b.alive)).toBe(true);
+    expect(next.lives).toBe(2);
+    expect(next.score).toBe(s.score);
+    expect(next.paddle).toEqual(s.paddle);
+    expect(next.ball.x).toBe(s.paddle.x + PADDLE_W / 2);
+    expect(next.ball.y).toBe(PADDLE_Y - BALL_R);
+    expect(next.ball.vx).toBe(0);
+    expect(next.ball.vy).toBe(0);
+  });
+
+  it('limpiar el nivel 2 lleva a levelClear y tap carga el nivel 3', () => {
+    const next = step(clearLevel(2), tap, DT);
+    expect(next.level).toBe(3);
+    expect(next.bricks).toHaveLength(52);
+  });
+
+  it('limpiar el nivel 3 lleva a won y tap vuelve al nivel 1', () => {
+    const s = clearLevel(3);
+    expect(s.phase).toBe('won');
+    const restarted = step(s, tap, DT);
+    expect(restarted).toEqual(createInitialState());
+    expect(restarted.level).toBe(1);
+  });
+
+  it('pause() en levelClear no cambia el estado', () => {
+    const s = clearLevel(1);
+    expect(pause(s)).toBe(s);
   });
 });
 
@@ -264,10 +323,10 @@ describe('explosiones', () => {
   });
 
   describe('último bloque', () => {
-    function cleared(): GameState {
+    function cleared(level = 1): GameState {
       const s0 = createInitialState();
       const bricks = s0.bricks.map((b, i) => ({ ...b, alive: i === 0 }));
-      return step(playing(underFirst, { bricks }), idle, DT);
+      return step(playing(underFirst, { bricks, level }), idle, DT);
     }
 
     it('pasa a clearing con bola y paddle quietos aunque haya input', () => {
@@ -280,10 +339,16 @@ describe('explosiones', () => {
       expect(moved.lives).toBe(s.lives);
     });
 
-    it('pasa a won cuando termina la explosión', () => {
-      const s = cleared();
+    it('pasa a won cuando termina la explosión en el último nivel', () => {
+      const s = cleared(LEVELS.length);
       expect(run(s, DURATION - 2 * DT).phase).toBe('clearing');
       expect(run(s, DURATION + DT).phase).toBe('won');
+    });
+
+    it('pasa a levelClear cuando termina la explosión en un nivel intermedio', () => {
+      const s = cleared(1);
+      expect(run(s, DURATION - 2 * DT).phase).toBe('clearing');
+      expect(run(s, DURATION + DT).phase).toBe('levelClear');
     });
 
     it('se pausa desde clearing y al reanudar vuelve a clearing', () => {

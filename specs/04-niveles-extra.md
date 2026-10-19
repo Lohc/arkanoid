@@ -1,6 +1,6 @@
 # SPEC 04 — Niveles extra
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-10-18
 > **Objetivo:** Encadenar 3 niveles con layouts de bloques distintos definidos como grillas de texto, pasando al siguiente tras limpiar el actual y mostrando Victoria solo al terminar el último.
@@ -120,18 +120,18 @@ Transiciones de `phase` nuevas o modificadas:
 
 ## Criterios de aceptación
 
-- [ ] `npm test` pasa, incluidos los tests nuevos de niveles.
-- [ ] `npx tsc --noEmit` pasa sin errores.
-- [ ] El nivel 1 se ve igual que antes de esta spec.
-- [ ] El HUD muestra `Nivel 1` al empezar, centrado entre Vidas y Puntos.
-- [ ] Al romper el último bloque del nivel 1 se ve su explosión y después `Nivel 1 superado` / `Toca para continuar` sobre fondo oscurecido.
-- [ ] Tras el tap aparece el nivel 2 (pirámide) con la bola sobre el paddle y `Toca para sacar`.
-- [ ] Vidas y puntos al empezar el nivel 2 son los mismos que al terminar el nivel 1.
-- [ ] El nivel 3 (tablero de 8 filas) se ve completo sin solaparse con HUD ni paddle.
-- [ ] Al limpiar el nivel 3 aparece `¡Victoria!`.
-- [ ] Reiniciar desde Game Over o Victoria vuelve al nivel 1 con vidas y puntos iniciales.
+- [x] `npm test` pasa, incluidos los tests nuevos de niveles.
+- [x] `npx tsc --noEmit` pasa sin errores.
+- [x] El nivel 1 se ve igual que antes de esta spec.
+- [x] El HUD muestra `Nivel 1` al empezar, centrado entre Vidas y Puntos.
+- [x] Al romper el último bloque del nivel 1 se ve su explosión y después `Nivel 1 superado` / `Toca para continuar` sobre fondo oscurecido.
+- [x] Tras el tap aparece el nivel 2 (pirámide) con la bola sobre el paddle y `Toca para sacar`.
+- [x] Vidas y puntos al empezar el nivel 2 son los mismos que al terminar el nivel 1.
+- [x] El nivel 3 (tablero de 8 filas) se ve completo sin solaparse con HUD ni paddle.
+- [x] Al limpiar el nivel 3 aparece `¡Victoria!`.
+- [x] Reiniciar desde Game Over o Victoria vuelve al nivel 1 con vidas y puntos iniciales.
 - [ ] Enviar la app a background en `levelClear` y volver mantiene `levelClear`.
-- [ ] Funciona en web y Android sin errores en consola.
+- [x] Funciona en web y Android sin errores en consola.
 
 ## Decisiones
 

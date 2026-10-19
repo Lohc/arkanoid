@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { Phase } from '../game/types';
 
 interface Message {
-  title?: string;
+  title?: string | ((level: number) => string);
   hint: string;
   dim: boolean; // oscurece el juego detrás del texto
 }
@@ -11,6 +11,11 @@ interface Message {
 const MESSAGES: Partial<Record<Phase, Message>> = {
   start: { hint: 'Toca para empezar', dim: false },
   serve: { hint: 'Toca para sacar', dim: false },
+  levelClear: {
+    title: (level) => `Nivel ${level} superado`,
+    hint: 'Toca para continuar',
+    dim: true,
+  },
   paused: { title: 'Pausa', hint: 'Toca para seguir', dim: true },
   gameover: { title: 'Game Over', hint: 'Toca para reiniciar', dim: true },
   won: { title: '¡Victoria!', hint: 'Toca para reiniciar', dim: true },
@@ -18,19 +23,21 @@ const MESSAGES: Partial<Record<Phase, Message>> = {
 
 interface Props {
   phase: Phase;
+  level: number;
   scale: number;
 }
 
 // Textos de cada fase sobre el área de juego. En `playing` no muestra nada.
-export function Overlay({ phase, scale }: Props) {
+export function Overlay({ phase, level, scale }: Props) {
   const message = MESSAGES[phase];
   if (!message) return null;
+  const title = typeof message.title === 'function' ? message.title(level) : message.title;
 
   return (
     <View style={[StyleSheet.absoluteFill, styles.layer, message.dim && styles.dim]}>
-      {message.title && (
+      {title && (
         <Text style={[styles.title, { fontSize: 40 * scale, marginBottom: 12 * scale }]}>
-          {message.title}
+          {title}
         </Text>
       )}
       <Text style={[styles.hint, { fontSize: 20 * scale }]}>{message.hint}</Text>

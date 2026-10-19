@@ -5,7 +5,7 @@ export const WORLD_H = 640;
 export const BRICK_W = 32;
 export const BRICK_H = 16;
 export const BRICK_COLS = 13;
-export const BRICK_ROWS = 6;
+export const MAX_BRICK_ROWS = 8; // filas máximas de un layout de LEVELS
 export const BRICKS_OFFSET_X = 16;
 export const BRICKS_OFFSET_Y = 64;
 

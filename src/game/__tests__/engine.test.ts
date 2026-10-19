@@ -2,6 +2,7 @@ import {
   BALL_R,
   BALL_SPEED,
   BRICK_POINTS,
+  EXPLOSION_FRAME_TIME,
   INITIAL_LIVES,
   MAX_DT,
   PADDLE_KEY_SPEED,
@@ -10,7 +11,7 @@ import {
   WORLD_H,
   WORLD_W,
 } from '../constants';
-import { createInitialState, pause, step } from '../engine';
+import { createInitialState, explosionFrame, pause, step } from '../engine';
 import type { GameState, Input } from '../types';
 
 const idle: Input = { paddleTargetX: null, keyDir: 0, tap: false };
@@ -156,4 +157,55 @@ it('step no muta el estado recibido', () => {
   const copy = JSON.parse(JSON.stringify(s));
   step({ ...s, phase: 'playing', ball: { ...s.ball, vy: -BALL_SPEED } }, idle, DT);
   expect(s).toEqual(copy);
+});
+
+describe('explosiones', () => {
+  // Bola subiendo justo debajo del primer bloque (x 16..48, y 64..80).
+  const underFirst = { x: 32, y: 80 + BALL_R + 1, vx: 0, vy: -BALL_SPEED };
+  const DURATION = EXPLOSION_FRAME_TIME * 4;
+
+  // Avanza `seconds` en pasos de DT con la entrada dada.
+  function run(s: GameState, seconds: number, input: Input = idle): GameState {
+    for (let t = 0; t < seconds; t += DT) s = step(s, input, DT);
+    return s;
+  }
+
+  it('romper un bloque crea una explosión con su posición y color', () => {
+    const s0 = playing(underFirst);
+    const { x, y, w, h, color } = s0.bricks[0];
+    const s = step(s0, idle, DT);
+    expect(s.explosions).toEqual([{ x, y, w, h, color, elapsed: 0 }]);
+    expect(explosionFrame(s.explosions[0])).toBe(0);
+  });
+
+  it('cambia de frame cada EXPLOSION_FRAME_TIME y desaparece tras 4 frames', () => {
+    const s = step(playing(underFirst), idle, DT);
+    const ball = { x: 200, y: 400, vx: 0, vy: 0 }; // quieta, lejos de todo
+    const quiet = { ...s, ball: { ...s.ball, ...ball } };
+    expect(explosionFrame(run(quiet, EXPLOSION_FRAME_TIME + DT).explosions[0])).toBe(1);
+    expect(run(quiet, DURATION - 2 * DT).explosions).toHaveLength(1);
+    expect(run(quiet, DURATION + DT).explosions).toHaveLength(0);
+  });
+
+  it('no avanza en pausa', () => {
+    const s = pause(step(playing(underFirst), idle, DT));
+    expect(step(s, idle, DT)).toBe(s);
+    expect(run(s, DURATION + DT).explosions).toEqual(s.explosions);
+  });
+
+  it('sigue avanzando en serve tras perder la bola', () => {
+    const s = step(playing(underFirst), idle, DT);
+    const lost = step({ ...s, ball: { ...s.ball, ...falling } }, idle, DT);
+    expect(lost.phase).toBe('serve');
+    expect(lost.explosions[0].elapsed).toBeCloseTo(DT);
+    expect(run(lost, DURATION + DT).explosions).toHaveLength(0);
+  });
+
+  it('tap en gameover deja las explosiones vacías', () => {
+    const s = step(playing(underFirst), idle, DT);
+    const over = step({ ...s, lives: 1, ball: { ...s.ball, ...falling } }, idle, DT);
+    expect(over.phase).toBe('gameover');
+    expect(over.explosions).toHaveLength(1);
+    expect(step(over, tap, DT).explosions).toEqual([]);
+  });
 });

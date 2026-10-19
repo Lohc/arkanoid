@@ -2,6 +2,7 @@ import {
   BALL_R,
   BALL_SPEED,
   BRICK_POINTS,
+  EXPLOSION_FRAME_TIME,
   INITIAL_LIVES,
   MAX_DT,
   PADDLE_H,
@@ -13,7 +14,8 @@ import {
 } from './constants';
 import { createBricks } from './level';
 import { bounceWalls, bouncePaddle, collideBricks } from './physics';
-import type { Ball, GameState, Input, Paddle } from './types';
+import { EXPLOSION_FRAMES } from './sprites';
+import type { Ball, Explosion, GameState, Input, Paddle } from './types';
 
 // Bola parada encima del centro del paddle, esperando saque.
 function ballOnPaddle(paddle: Paddle): Ball {
@@ -66,9 +68,33 @@ function movePaddle(paddle: Paddle, input: Input, dt: number): Paddle {
   return { ...paddle, x: Math.max(0, Math.min(WORLD_W - paddle.w, x)) };
 }
 
+// Índice del frame de EXPLOSION_FRAMES que toca dibujar.
+export function explosionFrame(explosion: Explosion): number {
+  return Math.floor(explosion.elapsed / EXPLOSION_FRAME_TIME);
+}
+
+// Avanza las animaciones y descarta las terminadas. Sin explosiones devuelve el mismo array.
+function advanceExplosions(explosions: Explosion[], dt: number): Explosion[] {
+  if (explosions.length === 0) return explosions;
+  return explosions
+    .map((e) => ({ ...e, elapsed: e.elapsed + dt }))
+    .filter((e) => explosionFrame(e) < EXPLOSION_FRAMES[e.color].length);
+}
+
 export function step(state: GameState, input: Input, rawDt: number): GameState {
   const dt = Math.min(Math.max(rawDt, 0), MAX_DT);
+  if (state.phase === 'paused') return stepPhase(state, input, dt);
 
+  // Las explosiones avanzan en todas las fases salvo en pausa.
+  const explosions = advanceExplosions(state.explosions, dt);
+  return stepPhase(
+    explosions === state.explosions ? state : { ...state, explosions },
+    input,
+    dt,
+  );
+}
+
+function stepPhase(state: GameState, input: Input, dt: number): GameState {
   switch (state.phase) {
     case 'clearing':
       return state;
@@ -107,13 +133,15 @@ export function step(state: GameState, input: Input, rawDt: number): GameState {
 
       const hit = collideBricks(ball, state.bricks);
       ball = hit.ball;
-      let { bricks, score } = state;
+      let { bricks, explosions, score } = state;
       if (hit.hitIndex !== null) {
         const index = hit.hitIndex;
+        const { x, y, w, h, color } = bricks[index];
         bricks = bricks.map((b, i) => (i === index ? { ...b, alive: false } : b));
+        explosions = [...explosions, { x, y, w, h, color, elapsed: 0 }];
         score += BRICK_POINTS;
         if (bricks.every((b) => !b.alive)) {
-          return { ...state, phase: 'won', paddle, ball, bricks, score };
+          return { ...state, phase: 'won', paddle, ball, bricks, explosions, score };
         }
       }
 
@@ -125,12 +153,13 @@ export function step(state: GameState, input: Input, rawDt: number): GameState {
           paddle,
           ball: ballOnPaddle(paddle),
           bricks,
+          explosions,
           score,
           lives,
         };
       }
 
-      return { ...state, paddle, ball, bricks, score };
+      return { ...state, paddle, ball, bricks, explosions, score };
     }
   }
 }

@@ -13,7 +13,8 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { WORLD_H, WORLD_W } from '../game/constants';
-import { SPRITES, type SpriteFrame } from '../game/sprites';
+import { explosionFrame } from '../game/engine';
+import { EXPLOSION_FRAMES, SPRITES, type SpriteFrame } from '../game/sprites';
 import type { GameState } from '../game/types';
 import { fitWorld } from '../game/viewport';
 import { Hud } from './Hud';
@@ -48,6 +49,10 @@ function drawWorld(canvas: SkCanvas, image: SkImage, state: GameState, scale: nu
 
   for (const b of state.bricks) {
     if (b.alive) drawSprite(canvas, image, SPRITES.blocks[b.color], b.x, b.y, b.w, b.h);
+  }
+  for (const e of state.explosions) {
+    const frame = EXPLOSION_FRAMES[e.color][explosionFrame(e)];
+    if (frame) drawSprite(canvas, image, frame, e.x, e.y, e.w, e.h);
   }
   const { paddle, ball } = state;
   drawSprite(canvas, image, SPRITES.paddle, paddle.x, paddle.y, paddle.w, paddle.h);

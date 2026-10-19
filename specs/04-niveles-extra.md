@@ -1,6 +1,6 @@
 # SPEC 04 — Niveles extra
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-10-18
 > **Objetivo:** Encadenar 3 niveles con layouts de bloques distintos definidos como grillas de texto, pasando al siguiente tras limpiar el actual y mostrando Victoria solo al terminar el último.
@@ -55,11 +55,17 @@ export interface GameState {
 // src/game/level.ts
 // Letra → color. '.' = sin bloque.
 const COLOR_CODES: Record<string, BrickColor> = {
-  r: 'red', y: 'yellow', c: 'cyan', m: 'magenta', p: 'hotpink', g: 'green',
+  r: 'red',
+  y: 'yellow',
+  c: 'cyan',
+  m: 'magenta',
+  p: 'hotpink',
+  g: 'green',
 };
 
 export const LEVELS: string[][] = [
-  [ // Nivel 1 — actual (78 bloques)
+  [
+    // Nivel 1 — actual (78 bloques)
     'rrrrrrrrrrrrr',
     'yyyyyyyyyyyyy',
     'ccccccccccccc',
@@ -67,7 +73,8 @@ export const LEVELS: string[][] = [
     'ppppppppppppp',
     'ggggggggggggg',
   ],
-  [ // Nivel 2 — pirámide invertida (48 bloques)
+  [
+    // Nivel 2 — pirámide invertida (48 bloques)
     'rrrrrrrrrrrrr',
     '.yyyyyyyyyyy.',
     '..ccccccccc..',
@@ -75,7 +82,8 @@ export const LEVELS: string[][] = [
     '....ppppp....',
     '.....ggg.....',
   ],
-  [ // Nivel 3 — tablero (52 bloques)
+  [
+    // Nivel 3 — tablero (52 bloques)
     'r.r.r.r.r.r.r',
     '.y.y.y.y.y.y.',
     'c.c.c.c.c.c.c',
@@ -145,12 +153,12 @@ Transiciones de `phase` nuevas o modificadas:
 
 ## Riesgos
 
-| Riesgo                                                       | Mitigación                                                                     |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| Tests de victoria de SPEC 01/02 esperan `won` tras nivel 1   | Paso 2 los ajusta (partir del nivel 3 o esperar `levelClear`).                 |
-| Layout mal escrito (fila de longitud distinta, letra rara)   | Test del paso 1 valida dimensiones y caracteres de cada layout.                |
-| `switch` exhaustivo en `stepPhase` sin `levelClear`          | `npx tsc --noEmit` en paso 2 detecta el caso faltante.                         |
-| Overlay oculta `levelClear` si falta su mensaje              | Paso 3 añade el mensaje; criterio de aceptación lo verifica visualmente.       |
+| Riesgo                                                     | Mitigación                                                               |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Tests de victoria de SPEC 01/02 esperan `won` tras nivel 1 | Paso 2 los ajusta (partir del nivel 3 o esperar `levelClear`).           |
+| Layout mal escrito (fila de longitud distinta, letra rara) | Test del paso 1 valida dimensiones y caracteres de cada layout.          |
+| `switch` exhaustivo en `stepPhase` sin `levelClear`        | `npx tsc --noEmit` en paso 2 detecta el caso faltante.                   |
+| Overlay oculta `levelClear` si falta su mensaje            | Paso 3 añade el mensaje; criterio de aceptación lo verifica visualmente. |
 
 ## Lo que **no** entra en esta spec
 

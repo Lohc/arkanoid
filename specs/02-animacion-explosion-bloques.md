@@ -1,6 +1,6 @@
 # SPEC 02 — Animación de explosión de bloques
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-18
 > **Objetivo:** Mostrar la animación de 4 frames de `EXPLOSION_FRAMES` en el lugar de cada bloque roto, gestionada por el engine puro.
@@ -86,18 +86,18 @@ Transiciones de `phase` nuevas o modificadas:
 
 ## Criterios de aceptación
 
-- [ ] `npm test` pasa, incluidos los tests nuevos de explosiones.
-- [ ] `npx tsc --noEmit` pasa sin errores.
-- [ ] Al romper un bloque, en su lugar se ve la animación de 4 frames de su color y luego queda vacío.
-- [ ] La animación dura ~600 ms (150 ms por frame).
-- [ ] Romper un bloque sigue sumando exactamente 10 puntos en el momento del choque.
-- [ ] La bola no rebota en un bloque que está explotando.
-- [ ] Varias explosiones simultáneas se animan de forma independiente.
+- [x] `npm test` pasa, incluidos los tests nuevos de explosiones.
+- [x] `npx tsc --noEmit` pasa sin errores.
+- [x] Al romper un bloque, en su lugar se ve la animación de 4 frames de su color y luego queda vacío.
+- [x] La animación dura ~600 ms (150 ms por frame).
+- [x] Romper un bloque sigue sumando exactamente 10 puntos en el momento del choque.
+- [x] La bola no rebota en un bloque que está explotando.
+- [x] Varias explosiones simultáneas se animan de forma independiente.
 - [ ] Perder la bola mientras hay explosiones en curso no las interrumpe.
-- [ ] Enviar la app a background con explosiones en curso las congela; al reanudar continúan desde el mismo frame.
+- [x] Enviar la app a background con explosiones en curso las congela; al reanudar continúan desde el mismo frame.
 - [ ] Al romper el último bloque, bola y paddle se quedan quietos, se ve la explosión completa y después aparece Victoria.
 - [ ] Reiniciar desde Game Over o Victoria no muestra explosiones residuales.
-- [ ] Funciona en web y Android sin errores en consola.
+- [x] Funciona en web y Android sin errores en consola.
 
 ## Decisiones
 

@@ -1,6 +1,6 @@
 # SPEC 03 — Sonidos de rebote y rotura de bloques
 
-> **Estado:** Aprobada
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-10-18
 > **Objetivo:** Reproducir `ball-bounce.mp3` cuando la bola rebota en paredes, techo o paddle y `break-sound.mp3` cuando rompe un bloque, en iOS, Android y web.
@@ -55,8 +55,8 @@ Convenciones:
 
 ## Criterios de aceptación
 
-- [ ] `npm test` pasa, incluidos los tests nuevos de sonidos.
-- [ ] `npx tsc --noEmit` pasa sin errores.
+- [x] `npm test` pasa, incluidos los tests nuevos de sonidos.
+- [x] `npx tsc --noEmit` pasa sin errores.
 - [ ] La bola rebota en pared izquierda, derecha, techo y paddle y suena `ball-bounce.mp3` en cada rebote.
 - [ ] Romper un bloque suena `break-sound.mp3` y no suena `ball-bounce.mp3` por ese choque.
 - [ ] Romper el último bloque suena `break-sound.mp3`.
@@ -65,7 +65,7 @@ Convenciones:
 - [ ] Enviar la app a background y volver no repite ningún sonido.
 - [ ] En iOS con el interruptor de silencio activado no suena nada.
 - [ ] En web, el primer rebote tras el clic de saque suena.
-- [ ] Funciona en web y Android sin errores en consola.
+- [x] Funciona en web y Android sin errores en consola.
 
 ## Decisiones
 
@@ -81,6 +81,8 @@ Convenciones:
 - **Sí:** respetar el modo silencio de iOS. Convención de juegos casuales; default de `expo-audio`.
 - **No:** mute o volumen en esta spec. Requiere UI y persistencia; va en su propia spec.
 - **Sí:** hook separado `src/audio/useGameSounds.ts`. No mezcla audio con el bucle de `useGameLoop`.
+- **Sí:** plugin `expo-audio` en `app.json` con `microphonePermission: false`, `recordAudioAndroid: false` y `enableBackgroundPlayback: false`. Solo reproducimos en primer plano; queda únicamente `MODIFY_AUDIO_SETTINGS`.
+- **No:** plugin con sus defaults. Pide micrófono (`RECORD_AUDIO`, `NSMicrophoneUsageDescription`), audio en background y foreground service sin necesitarlos.
 
 ## Riesgos
 

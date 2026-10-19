@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 
+import { useGameSounds } from './src/audio/useGameSounds';
 import { GameCanvas } from './src/components/GameCanvas';
 import { useGameLoop } from './src/hooks/useGameLoop';
 import { useGameInput } from './src/input/useGameInput';
@@ -8,6 +9,7 @@ import { useGameInput } from './src/input/useGameInput';
 export default function App() {
   const { viewProps, readInput } = useGameInput();
   const state = useGameLoop(readInput);
+  useGameSounds(state);
 
   return (
     <View style={styles.container} {...viewProps}>

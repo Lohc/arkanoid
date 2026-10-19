@@ -57,14 +57,14 @@ Convenciones:
 
 - [x] `npm test` pasa, incluidos los tests nuevos de sonidos.
 - [x] `npx tsc --noEmit` pasa sin errores.
-- [ ] La bola rebota en pared izquierda, derecha, techo y paddle y suena `ball-bounce.mp3` en cada rebote.
-- [ ] Romper un bloque suena `break-sound.mp3` y no suena `ball-bounce.mp3` por ese choque.
-- [ ] Romper el último bloque suena `break-sound.mp3`.
-- [ ] Dos roturas seguidas muy rápidas suenan ambas (la segunda reinicia la primera).
-- [ ] No suena nada en `start`, `serve`, `paused`, `clearing`, `gameover` ni `won`.
-- [ ] Enviar la app a background y volver no repite ningún sonido.
+- [x] La bola rebota en pared izquierda, derecha, techo y paddle y suena `ball-bounce.mp3` en cada rebote.
+- [x] Romper un bloque suena `break-sound.mp3` y no suena `ball-bounce.mp3` por ese choque.
+- [x] Romper el último bloque suena `break-sound.mp3`.
+- [x] Dos roturas seguidas muy rápidas suenan ambas (la segunda reinicia la primera).
+- [x] No suena nada en `start`, `serve`, `paused`, `clearing`, `gameover` ni `won`.
+- [x] Enviar la app a background y volver no repite ningún sonido.
 - [ ] En iOS con el interruptor de silencio activado no suena nada.
-- [ ] En web, el primer rebote tras el clic de saque suena.
+- [x] En web, el primer rebote tras el clic de saque suena.
 - [x] Funciona en web y Android sin errores en consola.
 
 ## Decisiones

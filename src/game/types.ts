@@ -47,6 +47,8 @@ export interface Explosion {
   elapsed: number; // s desde que se rompió
 }
 
+export type SoundEvent = 'bounce' | 'break';
+
 export interface GameState {
   phase: Phase;
   pausedFrom: Phase | null; // fase a la que vuelve al reanudar
@@ -54,6 +56,7 @@ export interface GameState {
   ball: Ball;
   bricks: Brick[];
   explosions: Explosion[];
+  sounds: SoundEvent[]; // sonidos a reproducir producidos en este paso
   lives: number;
   score: number;
 }

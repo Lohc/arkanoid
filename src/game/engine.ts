@@ -15,7 +15,7 @@ import {
 import { createBricks } from './level';
 import { bounceWalls, bouncePaddle, collideBricks } from './physics';
 import { EXPLOSION_FRAMES } from './sprites';
-import type { Ball, Explosion, GameState, Input, Paddle } from './types';
+import type { Ball, Explosion, GameState, Input, Paddle, SoundEvent } from './types';
 
 // Bola parada encima del centro del paddle, esperando saque.
 function ballOnPaddle(paddle: Paddle): Ball {
@@ -42,6 +42,7 @@ export function createInitialState(): GameState {
     ball: ballOnPaddle(paddle),
     bricks: createBricks(),
     explosions: [],
+    sounds: [],
     lives: INITIAL_LIVES,
     score: 0,
   };
@@ -57,7 +58,7 @@ export function pause(state: GameState): GameState {
   ) {
     return state;
   }
-  return { ...state, phase: 'paused', pausedFrom: state.phase };
+  return { ...state, phase: 'paused', pausedFrom: state.phase, sounds: [] };
 }
 
 // Dedo/ratón tiene prioridad sobre el teclado; siempre dentro del mundo.
@@ -84,6 +85,8 @@ function advanceExplosions(explosions: Explosion[], dt: number): Explosion[] {
 
 export function step(state: GameState, input: Input, rawDt: number): GameState {
   const dt = Math.min(Math.max(rawDt, 0), MAX_DT);
+  // Los sonidos solo describen un paso: se vacían al empezar cada uno.
+  if (state.sounds.length > 0) state = { ...state, sounds: [] };
   if (state.phase === 'paused') return stepPhase(state, input, dt);
 
   // Las explosiones avanzan en todas las fases salvo en pausa.
@@ -125,25 +128,28 @@ function stepPhase(state: GameState, input: Input, dt: number): GameState {
 
     case 'playing': {
       const paddle = movePaddle(state.paddle, input, dt);
-      let ball: Ball = {
+      const moved: Ball = {
         ...state.ball,
         x: state.ball.x + state.ball.vx * dt,
         y: state.ball.y + state.ball.vy * dt,
       };
-      ball = bounceWalls(ball);
-      ball = bouncePaddle(ball, paddle);
+      let ball = bouncePaddle(bounceWalls(moved), paddle);
+      // Rebote en pared, techo o paddle: la velocidad cambió. Uno por paso como máximo.
+      const sounds: SoundEvent[] =
+        ball.vx !== moved.vx || ball.vy !== moved.vy ? ['bounce'] : [];
 
       const hit = collideBricks(ball, state.bricks);
       ball = hit.ball;
       let { bricks, explosions, score } = state;
       if (hit.hitIndex !== null) {
+        sounds.push('break');
         const index = hit.hitIndex;
         const { x, y, w, h, color } = bricks[index];
         bricks = bricks.map((b, i) => (i === index ? { ...b, alive: false } : b));
         explosions = [...explosions, { x, y, w, h, color, elapsed: 0 }];
         score += BRICK_POINTS;
         if (bricks.every((b) => !b.alive)) {
-          return { ...state, phase: 'clearing', paddle, ball, bricks, explosions, score };
+          return { ...state, phase: 'clearing', paddle, ball, bricks, explosions, score, sounds };
         }
       }
 
@@ -157,11 +163,12 @@ function stepPhase(state: GameState, input: Input, dt: number): GameState {
           bricks,
           explosions,
           score,
+          sounds,
           lives,
         };
       }
 
-      return { ...state, paddle, ball, bricks, explosions, score };
+      return { ...state, paddle, ball, bricks, explosions, score, sounds };
     }
   }
 }

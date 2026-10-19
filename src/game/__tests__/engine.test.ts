@@ -154,6 +154,66 @@ describe('pausa', () => {
   });
 });
 
+describe('sonidos', () => {
+  it('el estado inicial no tiene sonidos', () => {
+    expect(createInitialState().sounds).toEqual([]);
+  });
+
+  it('pause() vacía los sonidos', () => {
+    const s = playing({ x: 200, y: 400 }, { sounds: ['bounce', 'break'] });
+    expect(pause(s).sounds).toEqual([]);
+  });
+
+  it('un paso en paused deja los sonidos vacíos', () => {
+    const p = { ...pause(playing({ x: 200, y: 400 })), sounds: ['break' as const] };
+    expect(step(p, idle, DT).sounds).toEqual([]);
+  });
+
+  describe('en playing', () => {
+    // Bola subiendo justo debajo del primer bloque (x 16..48, y 64..80).
+    const underFirst = { x: 32, y: 80 + BALL_R + 1, vx: 0, vy: -BALL_SPEED };
+
+    it('rebote en pared lateral → bounce', () => {
+      const s = step(playing({ x: BALL_R + 1, y: 400, vx: -BALL_SPEED, vy: 0 }), idle, DT);
+      expect(s.sounds).toEqual(['bounce']);
+    });
+
+    it('rebote en el techo → bounce', () => {
+      const s = step(playing({ x: 200, y: BALL_R + 1, vx: 0, vy: -BALL_SPEED }), idle, DT);
+      expect(s.sounds).toEqual(['bounce']);
+    });
+
+    it('rebote en el paddle → bounce', () => {
+      const s0 = createInitialState();
+      const x = s0.paddle.x + PADDLE_W / 2;
+      const s = step(playing({ x, y: PADDLE_Y - BALL_R, vx: 0, vy: BALL_SPEED }), idle, DT);
+      expect(s.ball.vy).toBeLessThan(0);
+      expect(s.sounds).toEqual(['bounce']);
+    });
+
+    it('romper un bloque → break, sin bounce por el bloque', () => {
+      expect(step(playing(underFirst), idle, DT).sounds).toEqual(['break']);
+    });
+
+    it('romper el último bloque → break', () => {
+      const s0 = createInitialState();
+      const bricks = s0.bricks.map((b, i) => ({ ...b, alive: i === 0 }));
+      const s = step(playing(underFirst, { bricks }), idle, DT);
+      expect(s.phase).toBe('clearing');
+      expect(s.sounds).toEqual(['break']);
+    });
+
+    it('paso sin choques → sin sonidos', () => {
+      const s = step(playing({ x: 200, y: 400, vx: 0, vy: -BALL_SPEED }), idle, DT);
+      expect(s.sounds).toEqual([]);
+    });
+
+    it('perder la bola → sin sonidos', () => {
+      expect(step(playing(falling), idle, DT).sounds).toEqual([]);
+    });
+  });
+});
+
 it('step no muta el estado recibido', () => {
   const s = createInitialState();
   const copy = JSON.parse(JSON.stringify(s));

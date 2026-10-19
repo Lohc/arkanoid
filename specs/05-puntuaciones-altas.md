@@ -1,6 +1,6 @@
 # SPEC 05 — Puntuaciones altas persistentes
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 04
 > **Fecha:** 2026-10-19
 > **Objetivo:** Guardar en el dispositivo las 5 mejores puntuaciones (puntos, nivel y fecha) y mostrarlas en inicio, Game Over y Victoria, avisando cuando la partida bate el récord.
@@ -87,20 +87,20 @@ Convenciones:
 
 ## Criterios de aceptación
 
-- [ ] `npm test` pasa, incluidos los tests nuevos de `highScores`.
-- [ ] `npx tsc --noEmit` pasa sin errores.
-- [ ] Primera ejecución (sin datos): la pantalla de inicio no muestra tabla.
-- [ ] Terminar una partida con puntos > 0 la añade a la lista en Game Over, en amarillo.
-- [ ] Batir la mejor puntuación muestra `¡Nuevo récord!`; entrar al top 5 sin ser #1 no lo muestra.
-- [ ] Terminar con 0 puntos no añade entrada.
-- [ ] Ganar los 3 niveles registra la partida con nivel 3 y la muestra en Victoria.
-- [ ] La lista nunca tiene más de 5 filas y está ordenada por puntos descendente.
-- [ ] Cada fila muestra posición, puntos, nivel y fecha `dd/mm/aaaa`.
-- [ ] Tras el tap de reinicio, la pantalla de inicio muestra la lista sin filas en amarillo.
-- [ ] Cerrar y volver a abrir la app (o recargar la pestaña) conserva la lista.
+- [x] `npm test` pasa, incluidos los tests nuevos de `highScores`.
+- [x] `npx tsc --noEmit` pasa sin errores.
+- [x] Primera ejecución (sin datos): la pantalla de inicio no muestra tabla.
+- [x] Terminar una partida con puntos > 0 la añade a la lista en Game Over, en amarillo.
+- [x] Batir la mejor puntuación muestra `¡Nuevo récord!`; entrar al top 5 sin ser #1 no lo muestra.
+- [x] Terminar con 0 puntos no añade entrada.
+- [x] Ganar los 3 niveles registra la partida con nivel 3 y la muestra en Victoria.
+- [x] La lista nunca tiene más de 5 filas y está ordenada por puntos descendente.
+- [x] Cada fila muestra posición, puntos, nivel y fecha `dd/mm/aaaa`.
+- [x] Tras el tap de reinicio, la pantalla de inicio muestra la lista sin filas en amarillo.
+- [x] Cerrar y volver a abrir la app (o recargar la pestaña) conserva la lista.
 - [ ] Con un valor inválido en `arkanoid:highScores:v1` la app arranca sin errores y con lista vacía.
-- [ ] La tabla no se solapa con bloques, HUD ni paddle.
-- [ ] Funciona en web y Android sin errores en consola.
+- [x] La tabla no se solapa con bloques, HUD ni paddle.
+- [x] Funciona en web y Android sin errores en consola.
 
 ## Decisiones
 

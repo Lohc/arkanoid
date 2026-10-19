@@ -14,6 +14,7 @@ import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { WORLD_H, WORLD_W } from '../game/constants';
 import { explosionFrame } from '../game/engine';
+import type { HighScore } from '../game/highScores';
 import { EXPLOSION_FRAMES, SPRITES, type SpriteFrame } from '../game/sprites';
 import type { GameState } from '../game/types';
 import { fitWorld } from '../game/viewport';
@@ -61,11 +62,13 @@ function drawWorld(canvas: SkCanvas, image: SkImage, state: GameState, scale: nu
 
 interface Props {
   state: GameState;
+  highScores: HighScore[];
+  lastRank: number | null;
 }
 
 // Dibuja el mundo 448×640 escalado uniformemente y centrado (letterbox).
 // No recibe eventos: el input lo captura la View padre (useGameInput).
-export function GameCanvas({ state }: Props) {
+export function GameCanvas({ state, highScores, lastRank }: Props) {
   const image = useImage(require('../../assets/spritesheet-breakout.png'));
   const [size, setSize] = useState({ w: 0, h: 0 });
 
@@ -94,7 +97,13 @@ export function GameCanvas({ state }: Props) {
             <Picture picture={picture} />
           </Canvas>
           <Hud state={state} scale={scale} />
-          <Overlay phase={state.phase} level={state.level} scale={scale} />
+          <Overlay
+            phase={state.phase}
+            level={state.level}
+            scale={scale}
+            highScores={highScores}
+            lastRank={lastRank}
+          />
         </View>
       )}
     </View>
